@@ -1,0 +1,66 @@
+import hashlib
+from os import path
+
+# Class to handle password cracking
+class PasswordCracker:
+    def __init__(self, hash_format):
+        """
+        Initializes the PasswordCracker with the specified hash format.
+        """
+        if hash_format not in hashlib.algorithms_guaranteed:
+            raise ValueError("Invalid hash format")
+        self.hash_format = hash_format
+        self.hashed_password = None
+
+    def hash_password(self, password):
+        """
+        Hashes the given password using the specified hash format.
+        """
+        hash_object = hashlib.new(self.hash_format)
+        hash_object.update(password.encode())
+        self.hashed_password = hash_object.hexdigest()
+
+    def crack_password(self, common_passwords_file):
+        """
+        Attempts to crack the hashed password using a wordlist.
+        """
+        try:
+            with open(common_passwords_file, 'r') as file:
+                for line in file:
+                    word = line.strip()
+                    hash_object = hashlib.new(self.hash_format)
+                    hash_object.update(word.encode())
+                    if hash_object.hexdigest() == self.hashed_password:
+                        return word
+        except Exception as e:
+            print(f"Error while reading the wordlist: {e}")
+        return None
+
+# Main logic
+if __name__ == "__main__":
+    # Get user inputs
+    hash_format = input("Enter the hash format (sha256, md5, sha1, sha512, or sha384): ").strip()
+    password = input("Enter the password to crack: ").strip()
+    common_passwords_file = input("Enter the location of the passwords file: ").strip()
+
+    # Validate the wordlist file
+    if not path.exists(common_passwords_file):
+        print("[-] Provide a valid wordlist file!")
+        exit()
+
+    # Initialize the PasswordCracker
+    try:
+        cracker = PasswordCracker(hash_format)
+    except ValueError as e:
+        print(e)
+        exit()
+
+    # Hash the password
+    cracker.hash_password(password)
+
+    # Attempt to crack the password
+    cracked_password = cracker.crack_password(common_passwords_file)
+    if cracked_password:
+        print(f"The password is: {cracked_password}")
+    else:
+        print("The password could not be cracked.")
