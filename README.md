@@ -1,5 +1,5 @@
 # Hash-Cracking-Python-
-#What is Hash Cracking 
+# What is Hash Cracking 
 Hash cracking is the process of discovering the original input data (often passwords) that was transformed into a hash using a cryptographic hash function.
 ash functions:
 - Are one-way (they can't be reversed mathematically).
